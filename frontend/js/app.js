@@ -118,10 +118,10 @@ function setView(view) {
     });
 }
 
-/* pie chart removed */
+/* pie chart-nya udah diapus */
 
-// NOTE: we must not escape using custom HTML escapers.
-// We use textContent via helper.
+// NOTE: kita jangan escape pake escaper HTML custom ya.
+// Kita pake textContent lewat helper aja.
 function escapeText(text) {
     const tmp = document.createElement("span");
     tmp.textContent = String(text);
@@ -192,7 +192,7 @@ function renderTransactions(txs) {
 async function refreshDashboard() {
     const txs = await fetchTransactions();
     renderTransactions(txs);
-    // also refresh stats for selected period (defaults to weekly)
+    // sekalian refresh stats buat periode yang dipilih (default-nya weekly)
     const activeDashPeriod =
         els.dashSegs
             .find((s) => s.classList.contains("is-active"))
@@ -277,7 +277,7 @@ async function handleAddSubmit(e) {
     }
 }
 
-// Convert DD-MM-YYYY to YYYY-MM-DD for date input
+// Ubah format DD-MM-YYYY ke YYYY-MM-DD buat input tanggal
 function convertDateForInput(dateStr) {
     if (!dateStr) return getTodayISODate();
     const parts = String(dateStr).split("-");
@@ -288,7 +288,7 @@ function convertDateForInput(dateStr) {
     return dateStr;
 }
 
-// Convert YYYY-MM-DD back to DD-MM-YYYY for backend
+// Balikin format YYYY-MM-DD ke DD-MM-YYYY buat backend
 function convertDateForBackend(dateStr) {
     if (!dateStr) return "";
     const [year, month, day] = String(dateStr).split("-");
@@ -301,12 +301,12 @@ let currentEditingIndex = null;
 function cancelInlineEdit() {
     if (currentEditingIndex === null) return;
     currentEditingIndex = null;
-    // Re-render to restore normal view
+    // Render ulang biar balik ke tampilan normal
     fetchTransactions().then(renderTransactions);
 }
 
 function startInlineEdit(index, tx) {
-    // If already editing another row, cancel it first
+    // Kalo lagi edit baris lain, batalin dulu aja
     if (currentEditingIndex !== null) {
         cancelInlineEdit();
     }
@@ -362,7 +362,7 @@ function startInlineEdit(index, tx) {
         </td>
     `;
 
-    // Focus on the first input
+    // Langsung fokus ke input pertama
     const firstInput = row.querySelector('.edit-input');
     if (firstInput) firstInput.focus();
 }
@@ -437,7 +437,7 @@ function attachTableDelegation() {
         }
     });
 
-    // Allow pressing Enter in edit inputs to save
+    // Biar bisa pencet Enter pas edit input buat nyimpen
     els.txTbody.addEventListener("keydown", async (e) => {
         if (e.key === "Enter" && currentEditingIndex !== null) {
             const input = e.target?.closest?.(".edit-input");
@@ -501,7 +501,7 @@ async function init() {
         els.themeToggle.addEventListener("click", async () => {
             try {
                 await toggleTheme();
-                // refresh stats totals if needed
+                // refresh total statistik kalo emang butuh
                 await refreshDashboard();
             } catch (err) {
                 showToast(err.message || "Gagal mengganti tema", false);
@@ -513,7 +513,7 @@ async function init() {
         document.documentElement.setAttribute("data-theme", stored);
     }
     await loadTheme();
-    // default segments
+    // segment default
     setActiveSeg(els.dashSegs, "weekly");
     setActiveSeg(els.statSegs, "all");
     await refreshDashboard();

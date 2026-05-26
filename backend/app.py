@@ -6,21 +6,20 @@ from backend.routes.statistics import statistics_bp
 from backend.routes.health import health_bp
 from backend.routes.theme import theme_bp
 
-
 def create_app() -> Flask:
     root_dir = os.path.dirname(os.path.abspath(__file__))
     frontend_dir = os.path.abspath(os.path.join(root_dir, "../frontend"))
 
-    # Jangan map static ke "/" karena mengganggu route index
+    # Jangan map static ke "/" ya biar gak ganggu route index
     app = Flask(__name__, static_folder=frontend_dir, static_url_path="/static")
 
-    # Ensure data directory exists
+    # Pastiin folder data udah dibikin
     os.makedirs(os.path.join(app.root_path, "database"), exist_ok=True)
 
     css_dir = os.path.join(frontend_dir, "css")
     js_dir = os.path.join(frontend_dir, "js")
 
-    # Serve static assets explicitly so they never get replaced by SPA fallback HTML.
+    # Sajikan file statis secara eksplisit biar gak ketimpa sama fallback HTML SPA.
     @app.route("/css/<path:filename>", methods=["GET"])
     def serve_css(filename: str):
         return send_from_directory(css_dir, filename)
@@ -29,7 +28,7 @@ def create_app() -> Flask:
     def serve_js(filename: str):
         return send_from_directory(js_dir, filename)
 
-    # Serve favicon if exists (optional)
+    # Sajikan favicon kalo emang ada (opsional)
     @app.route("/favicon.ico", methods=["GET"])
     def serve_favicon():
         ico_path = os.path.join(frontend_dir, "assets", "favicon.ico")
@@ -37,13 +36,13 @@ def create_app() -> Flask:
             return send_from_directory(os.path.join(frontend_dir, "assets"), "favicon.ico")
         return "", 204
 
-    # SPA entrypoint (termasuk HEAD karena curl -I)
+    # Entrypoint SPA (termasuk HEAD gara-gara curl -I)
     @app.route("/", methods=["GET", "HEAD"])
     def index():
         return send_from_directory(frontend_dir, "index.html")
 
-    # SPA fallback: untuk route "page" yang tidak dikenal, kembalikan index.html
-    # tapi jangan ganggu request API atau asset.
+    # Fallback SPA: buat route "page" yang gak dikenal, balikin index.html aja
+    # tapi jangan sampe ngeganggu request API atau asset ya.
     from flask import request
 
     @app.errorhandler(404)
@@ -52,7 +51,7 @@ def create_app() -> Flask:
         if path.startswith("/api/"):
             return "Not Found", 404
 
-        # Kalau request asset punya ekstensi, biarkan 404
+        # Kalo request asset-nya punya ekstensi, biarin aja 404
         if "." in path.rsplit("/", 1)[-1]:
             return "Not Found", 404
 
@@ -61,7 +60,7 @@ def create_app() -> Flask:
             return send_from_directory(frontend_dir, "index.html")
         return "Not Found", 404
 
-    # API routes
+    # Route buat API
     app.register_blueprint(health_bp, url_prefix="/api/health")
     app.register_blueprint(theme_bp, url_prefix="/api/theme")
     app.register_blueprint(transactions_bp, url_prefix="/api/transactions")

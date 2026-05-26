@@ -11,24 +11,19 @@ from backend.database.transactions_store import (
     validate_transaction_payload,
 )
 
-
 transactions_bp = Blueprint("transactions", __name__)
 
-
 def _app_root_path() -> str:
-    # backend/app.py berada di backend/
-    # app_root_path yang kita perlukan untuk menyimpan ke backend/database/
+    # backend/app.py kan adanya di folder backend/
+    # app_root_path yang kita butuhin buat nyimpen ke backend/database/
     import os
-
     return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
 
 @transactions_bp.get("")
 def list_transactions() -> Any:
     txs: List[Dict[str, Any]] = load_transactions(_app_root_path())
-    # frontend bisa pakai index sebagai id transaksi
+    # frontend bisa pake index buat jadi id transaksi
     return jsonify(txs)
-
 
 @transactions_bp.post("")
 def add_transaction() -> Any:
@@ -43,7 +38,6 @@ def add_transaction() -> Any:
 
     txs = create_transaction(_app_root_path(), tx)
     return jsonify(txs), 201
-
 
 @transactions_bp.put("/<int:index>")
 def edit_transaction(index: int) -> Any:
@@ -62,7 +56,6 @@ def edit_transaction(index: int) -> Any:
         return jsonify({"error": "Transaction not found"}), 404
 
     return jsonify(txs)
-
 
 @transactions_bp.delete("/<int:index>")
 def delete_transaction(index: int) -> Any:

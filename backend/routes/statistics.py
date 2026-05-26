@@ -8,17 +8,14 @@ from backend.database.transactions_store import load_transactions
 
 statistics_bp = Blueprint("statistics", __name__)
 
-
 def _app_root_path() -> str:
     import os
 
     return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-
 def _parse_date(value: str) -> date:
-    # expects DD-MM-YYYY
+    # formatnya DD-MM-YYYY ya
     return datetime.strptime(value, "%d-%m-%Y").date()
-
 
 def _range_for(period: Literal["weekly", "monthly", "all"]) -> Tuple[date, date]:
     today = date.today()
@@ -26,14 +23,14 @@ def _range_for(period: Literal["weekly", "monthly", "all"]) -> Tuple[date, date]
         return date.min, today
 
     if period == "weekly":
-        # 7 hari terakhir termasuk hari ini
+        # 7 hari terakhir, udah termasuk hari ini
         start = today - timedelta(days=6)
         return start, today
 
     if period == "monthly":
-        # bulan kalender berjalan
+        # bulan yang lagi jalan sekarang
         start = today.replace(day=1)
-        # end = hari terakhir bulan ini
+        # end itu hari paling akhir di bulan ini
         if today.month == 12:
             next_month = today.replace(year=today.year + 1, month=1, day=1)
         else:
@@ -41,15 +38,14 @@ def _range_for(period: Literal["weekly", "monthly", "all"]) -> Tuple[date, date]
         end = next_month - timedelta(days=1)
         return start, end
 
-    # fallback
+    # pilihan terakhir (fallback)
     return date.min, today
-
 
 def _filter_transactions(txs: List[Dict[str, Any]], period: str) -> List[Dict[str, Any]]:
     start, end = _range_for(period)  # type: ignore[arg-type]
     filtered: List[Dict[str, Any]] = []
     for tx in txs:
-        # Desain menyebut created_at, tapi payload JSON kita memakai date
+        # di rancangan dibilang created_at, tapi payload JSON kita pakenya date
         d = tx.get("date") or tx.get("created_at")
         if not d:
             continue
@@ -60,7 +56,6 @@ def _filter_transactions(txs: List[Dict[str, Any]], period: str) -> List[Dict[st
         if start <= tx_date <= end:
             filtered.append(tx)
     return filtered
-
 
 @statistics_bp.get("")
 def statistics() -> Any:
@@ -80,7 +75,6 @@ def statistics() -> Any:
     categories = list(by_category.keys())
     values = [by_category[c] for c in categories]
 
-    # format chart: pie chart labels + values
     return jsonify(
         {
             "period": period,

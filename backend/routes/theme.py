@@ -6,12 +6,10 @@ theme_bp = Blueprint("theme", __name__)
 
 THEME_FILE = "theme.json"
 
-
 def _data_path() -> str:
     base_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "database")
     os.makedirs(base_dir, exist_ok=True)
     return os.path.join(base_dir, THEME_FILE)
-
 
 @theme_bp.get("")
 def get_theme() -> object:
@@ -27,7 +25,6 @@ def get_theme() -> object:
         return jsonify({"theme": theme})
     except Exception:
         return jsonify({"theme": "normal"})
-
 
 @theme_bp.post("")
 def set_theme() -> object:
